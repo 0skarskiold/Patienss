@@ -10,13 +10,12 @@ import os #Importar os så att jag kan hitta bilderna i assets-mappen
 
 #Fixa blandad kortlek, viktigt, svårt att göra
 
-
 WIDTH, HEIGHT = 1000, 650
 WIN = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Patiens") #Namnet på fönstret
 fps = 240 #240Hz, snabba grejer
 CARD_WIDTH, CARD_HEIGHT = 80, 120
-
+#haha
 
 ROW1 = 200
 ROW2 = 350
