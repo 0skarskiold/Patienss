@@ -15,7 +15,7 @@ WIN = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Patiens") #Namnet på fönstret
 fps = 240 #240Hz, snabba grejer
 CARD_WIDTH, CARD_HEIGHT = 80, 120
-#haha
+
 
 ROW1 = 200
 ROW2 = 350
