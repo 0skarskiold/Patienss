@@ -1,5 +1,6 @@
 import pygame
 import os #Importar os så att jag kan hitta bilderna i assets-mappen
+import random
 
 
 #Fixa så att man flyttar flera kort när man flyttar högsta
@@ -87,6 +88,32 @@ CARD6 = Kort("klover", "svart", 2, ROW1, 20, K2_RESIZED)
 #En array som innehåller alla korten. Typ som en kortlek
 LIST_OF_CARDS = [CARD1, CARD2, CARD3, CARD4, CARD5, CARD6]
 
+#Slumpar alla korten
+RAND_LIST_OF_CARDS = LIST_OF_CARDS
+random.shuffle(LIST_OF_CARDS)
+
+
+#FIXA NÅGOT SÄTT ATT FÅ IN KORTEN I RADERNA SLUMPMÄSSIGT !!!
+#måste sätta x och ypos till något här innan alla annan kod börjar
+#En array för varje rad
+CARDS_IN_ROW1 = [CARD1, CARD6]
+CARDS_IN_ROW2 = [CARD2]
+CARDS_IN_ROW3 = [CARD3]
+CARDS_IN_ROW4 = [CARD4]
+CARDS_IN_ROW5 = [CARD5]
+
+#En array med alla rader i sig
+ALL_ROWS = [CARDS_IN_ROW1, CARDS_IN_ROW2, CARDS_IN_ROW3, CARDS_IN_ROW4, CARDS_IN_ROW5]
+
+i = 0
+while i < len(ALL_ROWS):
+    j = 0
+    while j < len(ALL_ROWS[i]):
+        ALL_ROWS[i][j].xpos = i*220
+        j += 1
+
+    i += 1
+
 #Funktionen ritar alla kort samt bakgrunden
 #Tar inte in några argument
 #Returnerar inget
@@ -101,10 +128,16 @@ def draw_window():
         WIN.blit(UPSIDE_DOWN_CARD_RESIZED, (current_card.xpos, current_card.ypos-10))
         i += 1
 
+
     i = 0
-    while i < len(LIST_OF_CARDS):
-        current_card = LIST_OF_CARDS[i]
-        WIN.blit(current_card.image, (current_card.xpos, current_card.ypos))
+    while i < len(ALL_ROWS):
+        current_row = ALL_ROWS[i]
+        j = 0
+        while j < len(current_row):
+            current_row_card = current_row[j]
+            WIN.blit(current_row_card.image, (current_row_card.xpos, current_row_card.ypos))
+            j += 1
+
         i += 1
 
     pygame.display.update()
