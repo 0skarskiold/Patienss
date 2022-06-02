@@ -6,10 +6,8 @@ import random
 #Fixa så att man flyttar flera kort när man flyttar högsta
 #Fixa så att korten inte hamnar på varandra
 #fixa så att man kan lägga kungen på en tom yta
-#Fixa bugg där man kan klicka på två kort samtidigt --> inget flyttar sig
-#Man kan klicka på ett kort genom ett annat
-
 #Fixa blandad kortlek, viktigt, svårt att göra
+#Uppdatera alla kommentarer kring input/return
 
 WIDTH, HEIGHT = 1000, 650
 WIN = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -109,7 +107,8 @@ i = 0
 while i < len(ALL_ROWS):
     j = 0
     while j < len(ALL_ROWS[i]):
-        ALL_ROWS[i][j].xpos = i*220
+        ALL_ROWS[i][j].xpos = i*220  #hitta bättre värde
+        ALL_ROWS[i][j].ypos = j * 30 + 20
         j += 1
 
     i += 1
@@ -127,7 +126,6 @@ def draw_window():
         current_card = LIST_OF_CARDS[i]
         WIN.blit(UPSIDE_DOWN_CARD_RESIZED, (current_card.xpos, current_card.ypos-10))
         i += 1
-
 
     i = 0
     while i < len(ALL_ROWS):
@@ -148,38 +146,59 @@ def draw_window():
 #Funktionen returnar inget utan ändrar istället värdena på cards x- och ypos
 #By: Oskar Skiöld Lundquist
 #Date: 2022-05-30
-def move_card(card, parent_card):
-    card.xpos = parent_card.xpos
-    card.ypos = parent_card.ypos + 30
+
+
+def move_card(card, parent_card_row_index, card_row):
+    card_row.remove(card)
+    ALL_ROWS[parent_card_row_index].append(card)
 
 
 #Denna funktionen kollar om ett visst kort går att flytta
 #Argument 1, card: Det Kort som funktionen kollar om det är möjligt att flytta
 #Argument2, list_of_cards: En array som innehåller alla kort.
-#Return: Indexet för det Kort i list_of_cards som card kan flyttas till, finns inget kort returneras None
+#Return: True om kortet går att flytta, False om det inte går att flytta
 #By: Oskar Skiöld Lundquist
 #Date: 2022-05-30
-def is_moveable(card, list_of_cards):
+def is_moveable(card):
     i = 0
-    while i < len(list_of_cards):
-        if list_of_cards[i].sr_farg != card.sr_farg and list_of_cards[i].varde == card.varde + 1 and list_of_cards[i].xpos != card.xpos:
-            global parent_card
-            parent_card = list_of_cards[i]
-            return list_of_cards[i]
-
+    list_of_lowest_cards = []
+    while i < len(ALL_ROWS):
+        lowest_card_index = len(ALL_ROWS[i]) - 1
+        lowest_card = ALL_ROWS[i][lowest_card_index]
+        list_of_lowest_cards.append(lowest_card)
         i += 1
+
+
+    i = 0
+    while i < len(list_of_lowest_cards):
+        if list_of_lowest_cards[i].sr_farg != card.sr_farg and list_of_lowest_cards[i].varde == card.varde + 1 and list_of_lowest_cards[i].xpos != card.xpos:
+            global parent_card
+            parent_card = list_of_lowest_cards[i]
+            global parent_card_row_index
+            parent_card_row_index = i - 1
+            return True
+        i += 1
+    return False
 
 #Funktionen kollar om spelaren klickade på ett kort eller inte genom att skapa en rektangel för varje kort och sedan använde collidepoint för att kolla om spelaren klickade inom rektangeln.
 #Argument 1, mousepos: Detta är musens position inom spelfönstret, beskrivs av python som (x, y).
 #Return: Det kort som spelaren klickade på. Klickade spelaren inte på något kort returneras None.
 #By: Oskar Skiöld Lundquist
 #Date: 2022-05-30
+
+#PROBLEMET HÄR!!
+#Programmet blir surt när det blir en tom rad
 def clicked_on_card(mousepos):
     i = 0
-    while i < len(LIST_OF_CARDS):
-        card_rect = pygame.Rect(LIST_OF_CARDS[i].xpos, LIST_OF_CARDS[i].ypos, CARD_WIDTH, CARD_HEIGHT)
+    while i < len(ALL_ROWS):
+        lowest_card_index = len(ALL_ROWS[i]) - 1
+        lowest_card = ALL_ROWS[i][lowest_card_index]
+
+        card_rect = pygame.Rect(lowest_card.xpos, lowest_card.ypos, CARD_WIDTH, CARD_HEIGHT)
         if card_rect.collidepoint(mousepos):
-            return LIST_OF_CARDS[i]
+            global card_row
+            card_row = ALL_ROWS[i]
+            return lowest_card
         i += 1
 
 #Main-funktionen. Härifrån går jag in i alla andra funktioner. Denna funktionen är också ansvarig för att stänga ner spelet om användaren trycker på krysset.
@@ -198,8 +217,8 @@ def main():
             if event.type == pygame.MOUSEBUTTONUP:
                 mousepos = pygame.mouse.get_pos()
                 clicked_card = clicked_on_card(mousepos)
-                if clicked_card is not None and is_moveable(clicked_card, LIST_OF_CARDS) is not None:
-                    move_card(clicked_card, parent_card)
+                if clicked_card is not None and is_moveable(clicked_card):
+                    move_card(clicked_card, parent_card_row_index, card_row)
 
         draw_window()
     pygame.quit()
