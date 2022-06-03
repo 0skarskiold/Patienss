@@ -103,6 +103,8 @@ CARDS_IN_ROW5 = [CARD5]
 #En array med alla rader i sig
 ALL_ROWS = [CARDS_IN_ROW1, CARDS_IN_ROW2, CARDS_IN_ROW3, CARDS_IN_ROW4, CARDS_IN_ROW5]
 
+
+
 i = 0
 while i < len(ALL_ROWS):
     j = 0
@@ -140,6 +142,18 @@ def draw_window():
 
     pygame.display.update()
 
+def update_pos():
+
+    i = 0
+    while i < len(ALL_ROWS):
+        j = 0
+        while j < len(ALL_ROWS[i]):
+            ALL_ROWS[i][j].xpos = i * 220  # hitta bättre värde
+            ALL_ROWS[i][j].ypos = j * 30 + 20
+            j += 1
+
+        i += 1
+
 #Funktionen flyttar ett kort till ett ställe under det andra
 #Argument 1, card: Är det Kort som ska flyttas
 #Argument 2, parent_card: Är det Kort som card ska flyttas till
@@ -175,7 +189,8 @@ def is_moveable(card):
             global parent_card
             parent_card = list_of_lowest_cards[i]
             global parent_card_row_index
-            parent_card_row_index = i - 1
+            parent_card_row_index = i
+            print(parent_card.varde)
             return True
         i += 1
     return False
@@ -219,7 +234,7 @@ def main():
                 clicked_card = clicked_on_card(mousepos)
                 if clicked_card is not None and is_moveable(clicked_card):
                     move_card(clicked_card, parent_card_row_index, card_row)
-
+        update_pos()
         draw_window()
     pygame.quit()
 
