@@ -1,5 +1,6 @@
 import pygame
 import os #Importar os så att jag kan hitta bilderna i assets-mappen
+#Min testfil, här sparar jag just nu en tidigare version av koden
 
 
 #Fixa så att man flyttar flera kort när man flyttar högsta

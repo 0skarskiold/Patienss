@@ -2,14 +2,6 @@ import pygame
 import os #Importar os så att jag kan hitta bilderna i assets-mappen
 
 
-#Fixa så att man flyttar flera kort när man flyttar högsta
-#Fixa så att korten inte hamnar på varandra
-#fixa så att man kan lägga kungen på en tom yta
-#Fixa bugg där man kan klicka på två kort samtidigt --> inget flyttar sig
-#Man kan klicka på ett kort genom ett annat
-
-#Fixa blandad kortlek, viktigt, svårt att göra
-
 WIDTH, HEIGHT = 1000, 650
 WIN = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Patiens") #Namnet på fönstret
@@ -23,7 +15,7 @@ ROW3 = 500
 ROW4 = 650
 ROW5 = 800
 
-#är läser jag in alla bilder och gör om deras storlek
+#Här läser jag in alla bilder och gör om deras storlek
 BACKGROUND = pygame.image.load(
     os.path.join('Assets', 'background.jpg')
 )

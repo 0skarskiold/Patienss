@@ -1,13 +1,9 @@
 import pygame
 import os #Importar os så att jag kan hitta bilderna i assets-mappen
 import random
+#Man ska egentligen inte kunna lägga kungen på något kort, men axel är så pogchamp att man kan lägga en kung där ändå
 
 
-#Fixa så att man flyttar flera kort när man flyttar högsta
-#Fixa så att korten inte hamnar på varandra
-#fixa så att man kan lägga kungen på en tom yta
-#Fixa blandad kortlek, viktigt, svårt att göra
-#Uppdatera alla kommentarer kring input/return
 
 WIDTH, HEIGHT = 1000, 650
 WIN = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -91,8 +87,6 @@ RAND_LIST_OF_CARDS = LIST_OF_CARDS
 random.shuffle(LIST_OF_CARDS)
 
 
-#FIXA NÅGOT SÄTT ATT FÅ IN KORTEN I RADERNA SLUMPMÄSSIGT !!!
-#måste sätta x och ypos till något här innan alla annan kod börjar
 #En array för varje rad
 CARDS_IN_ROW1 = [CARD1, CARD6]
 CARDS_IN_ROW2 = [CARD2]
@@ -148,7 +142,7 @@ def update_pos():
     while i < len(ALL_ROWS):
         j = 0
         while j < len(ALL_ROWS[i]):
-            ALL_ROWS[i][j].xpos = i * 220  # hitta bättre värde
+            ALL_ROWS[i][j].xpos = i * 220 + 10
             ALL_ROWS[i][j].ypos = j * 30 + 20
             j += 1
 
@@ -156,10 +150,11 @@ def update_pos():
 
 #Funktionen flyttar ett kort till ett ställe under det andra
 #Argument 1, card: Är det Kort som ska flyttas
-#Argument 2, parent_card: Är det Kort som card ska flyttas till
+#Argument 2, parent_card_row_index: Indexet för den rad som parent_card ligger i. Parent_card är kortet som ska flyttas till
+#Argument 3, card_row: Den rad som kortet som ska flyttas ligger på.
 #Funktionen returnar inget utan ändrar istället värdena på cards x- och ypos
 #By: Oskar Skiöld Lundquist
-#Date: 2022-05-30
+#Date: 2022-06-03
 
 
 def move_card(card, parent_card_row_index, card_row):
@@ -169,7 +164,6 @@ def move_card(card, parent_card_row_index, card_row):
 
 #Denna funktionen kollar om ett visst kort går att flytta
 #Argument 1, card: Det Kort som funktionen kollar om det är möjligt att flytta
-#Argument2, list_of_cards: En array som innehåller alla kort.
 #Return: True om kortet går att flytta, False om det inte går att flytta
 #By: Oskar Skiöld Lundquist
 #Date: 2022-05-30
@@ -177,11 +171,15 @@ def is_moveable(card):
     i = 0
     list_of_lowest_cards = []
     while i < len(ALL_ROWS):
-        lowest_card_index = len(ALL_ROWS[i]) - 1
-        lowest_card = ALL_ROWS[i][lowest_card_index]
-        list_of_lowest_cards.append(lowest_card)
+        if len(ALL_ROWS[i]) > 1:
+            lowest_card_index = len(ALL_ROWS[i]) - 1
+            lowest_card = ALL_ROWS[i][lowest_card_index]
+            list_of_lowest_cards.append(lowest_card)
+        elif len(ALL_ROWS[i]) == 1:
+            lowest_card_index = 0
+            lowest_card = ALL_ROWS[i][lowest_card_index]
+            list_of_lowest_cards.append(lowest_card)
         i += 1
-
 
     i = 0
     while i < len(list_of_lowest_cards):
@@ -190,31 +188,39 @@ def is_moveable(card):
             parent_card = list_of_lowest_cards[i]
             global parent_card_row_index
             parent_card_row_index = i
-            print(parent_card.varde)
+
             return True
         i += 1
     return False
 
 #Funktionen kollar om spelaren klickade på ett kort eller inte genom att skapa en rektangel för varje kort och sedan använde collidepoint för att kolla om spelaren klickade inom rektangeln.
-#Argument 1, mousepos: Detta är musens position inom spelfönstret, beskrivs av python som (x, y).
+#Argument 1, mousepos: Detta är musens position inom spelfönstret
 #Return: Det kort som spelaren klickade på. Klickade spelaren inte på något kort returneras None.
 #By: Oskar Skiöld Lundquist
 #Date: 2022-05-30
 
-#PROBLEMET HÄR!!
-#Programmet blir surt när det blir en tom rad
 def clicked_on_card(mousepos):
+
     i = 0
     while i < len(ALL_ROWS):
-        lowest_card_index = len(ALL_ROWS[i]) - 1
-        lowest_card = ALL_ROWS[i][lowest_card_index]
+        test_if_click = True
+        if len(ALL_ROWS[i]) > 1:
+            lowest_card_index = len(ALL_ROWS[i]) - 1
+            lowest_card = ALL_ROWS[i][lowest_card_index]
+        elif len(ALL_ROWS[i]) == 1:
+            lowest_card_index = 0
+            lowest_card = ALL_ROWS[i][lowest_card_index]
+        else:
+            test_if_click = False
+
 
         card_rect = pygame.Rect(lowest_card.xpos, lowest_card.ypos, CARD_WIDTH, CARD_HEIGHT)
-        if card_rect.collidepoint(mousepos):
+        if card_rect.collidepoint(mousepos) and test_if_click:
             global card_row
             card_row = ALL_ROWS[i]
             return lowest_card
-        i += 1
+        else:
+            i += 1
 
 #Main-funktionen. Härifrån går jag in i alla andra funktioner. Denna funktionen är också ansvarig för att stänga ner spelet om användaren trycker på krysset.
 #Tar inte in några argument
